@@ -39,11 +39,6 @@ router
     userController.resetForgotPassword
   );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//router.post(
-//   "/uploadImage",
-//   auth(userType.USER),
-//   upload,
-//   userController.imageUpload
-// );
+
 
 module.exports = router;

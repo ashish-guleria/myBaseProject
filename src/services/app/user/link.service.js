@@ -1,7 +1,7 @@
 const { BAD_REQUEST } = require("http-status");
 const httpStatus = require("http-status");
 const { Link } = require("../../../models");
-const { ApiError } = require("../../../utils/commonFunction");
+const { ApiError } = require("../../../utils/universalFunction");
 
 const createLink = async (userId, data) => {
   console.log(userId);

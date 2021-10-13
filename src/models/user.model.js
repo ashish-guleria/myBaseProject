@@ -5,9 +5,6 @@ const { userType } = require("../config/appConstants");
 const userSchema = mongoose.Schema(
   {
     name: { type: String, trim: true },
-    university: { type: String },
-    club: { type: String },
-    userName: { type: String, lowercase: true, trim: true, unique: true },
     email: { type: String, lowercase: true, trim: true, unique: true },
     password: { type: String },
     phoneNumber: { type: Number },
@@ -22,11 +19,7 @@ const userSchema = mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     facebookId: { type: String },
     appleId: { type: String },
-    otp: {
-      code: { type: Number },
-      expiresAt: { type: Date },
-      isNumberUpdate: { type: Boolean },
-    },
+    
   },
   {
     timestamps: true,
@@ -38,11 +31,10 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   return user;
 };
 
-userSchema.statics.isUserNameTaken = async function (userName, excludeUserId) {
-  const user = await this.findOne({ userName, _id: { $ne: excludeUserId } });
-  return !!user;
-};
-userSchema.statics.isPhoneNumberTaken = async function (phoneNumber, excludeUserId) {
+userSchema.statics.isPhoneNumberTaken = async function (
+  phoneNumber,
+  excludeUserId
+) {
   const user = await this.findOne({ phoneNumber, _id: { $ne: excludeUserId } });
   return !!user;
 };

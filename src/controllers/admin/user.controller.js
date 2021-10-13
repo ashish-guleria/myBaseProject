@@ -4,14 +4,10 @@ const {
   userService,
 } = require("../../services");
 const { userType } = require("../../config/appConstants");
-const {
-  catchAsync,
-  successMessage,
-  formatUser,
-} = require("../../utils/commonFunction");
+const { catchAsync, successMessage } = require("../../utils/universalFunction");
+const { formatUser } = require("../../utils/formatResponse");
 
 const getUsers = catchAsync(async (req, res) => {
-  
   const data = await adminUserService.getUsers(
     req.query.page,
     req.query.limit,

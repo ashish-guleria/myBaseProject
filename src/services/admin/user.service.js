@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const { User } = require("../../models");
-const { ApiError } = require("../../utils/commonFunction");
+const { ApiError } = require("../../utils/universalFunction");
 const { userType } = require("../../config/appConstants");
 
 const getUsers = async (page, limit, search) => {

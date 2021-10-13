@@ -1,11 +1,10 @@
 const httpStatus = require("http-status");
-const { User } = require("../../models");
-const { ApiError } = require("../../utils/commonFunction");
+const { User, Token } = require("../../models");
+const { ApiError } = require("../../utils/universalFunction");
 const { joi, loginType } = require("../../config/appConstants");
+const { ERROR } = require("../../config/responseMessage");
 
 const socialLogin = (userBody) => {
-  const username = "user_" + Math.random().toString(36).substr(2, 3);
-
   if (userBody.loginType == loginType.FACEBOOK) {
     return User.findOneAndUpdate(
       {
@@ -16,7 +15,6 @@ const socialLogin = (userBody) => {
         $setOnInsert: {
           email: userBody.email,
           name: userBody.name,
-          userName: username,
           isVerified: true,
         },
       },
@@ -42,26 +40,23 @@ const socialLogin = (userBody) => {
 };
 
 const createUser = async (userBody) => {
-  if (await User.isUserNameTaken(userBody.userName)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User name already taken");
-  }
   if (await User.isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "email already taken");
+    throw new ApiError("", ERROR.EMAIL_ALREADY_EXIST);
   }
   if (await User.isPhoneNumberTaken(userBody.phoneNumber)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Phone number already taken");
+    throw new ApiError("", ERROR.NUMBER_ALREADY_EXIST);
   }
   const user = await User.create(userBody);
   return user;
 };
 
-const userLogin = async (userName, password) => {
-  const user = await User.findOne({ userName });
+const userLogin = async (email, password) => {
+  const user = await User.findOne({ email });
   if (!user) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "User doest not exist");
+    throw new ApiError("en", ERROR.EMAIL_NOT_FOUND);
   }
   if (!(await user.isPasswordMatch(password))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect password");
+    throw new ApiError("en", ERROR.WRONG_PASSWORD);
   }
   return user;
 };
@@ -88,23 +83,24 @@ const verifyUser = async (userId) => {
   return user;
 };
 
-const verifyOtp = async (userId, enterOtp, savedOtp) => {
+const verifyOtp = async (tokenId, enterOtp, savedOtp) => {
   if (enterOtp != savedOtp) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Incorrect OTP");
+    throw new ApiError("en", ERROR.INCORRECT_OTP);
   }
-  const user = await User.findByIdAndUpdate(
-    userId,
+  const token = await Token.findByIdAndUpdate(
+    tokenId,
     {
-      isVerified: true,
       $unset: { otp: "" },
     },
     { new: true, lean: true }
   );
+  const user = await User.findByIdAndUpdate(token.user, { isVerified: true });
+
   return user;
 };
 
 const resendOtp = async (userId, otpdata) => {
-  const user = await User.findByIdAndUpdate(
+  const user = await Token.findByIdAndUpdate(
     userId,
     {
       $set: { otp: otpdata },

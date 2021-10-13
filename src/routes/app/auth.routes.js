@@ -1,6 +1,6 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
-const { validate, validateView } = require("../../middlewares/validate");
+const { validate } = require("../../middlewares/validate");
 const userValidation = require("../../validations/app/auth.validation");
 const userController = require("../../controllers/app/auth.controller");
 const { userType } = require("../../config/appConstants");
@@ -19,12 +19,7 @@ router.post("/resendOtp", auth(userType.USER), userController.resendOtp);
 
 router.post("/login", validate(userValidation.userLogin), userController.login);
 
-router.post(
-  "/refreshTokens",
-  auth(userType.USER),
-  validate(userValidation.refreshTokens),
-  userController.refreshTokens
-);
+router.post("/refreshToken", auth(userType.USER), userController.refreshTokens);
 
 router.post(
   "/logout",
@@ -38,17 +33,5 @@ router.post(
   validate(userValidation.socialLogin),
   userController.socialLogin
 );
-
-router.get(
-  "/verify",
-  validate(userValidation.getVerified),
-  userController.getVerified
-);
-
-// router.post(
-//   "/resendVerificationEmail",
-//   validate(userValidation.getVerified),
-//   userController.getVerified
-// );
 
 module.exports = router;

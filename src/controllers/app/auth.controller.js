@@ -1,96 +1,92 @@
 const { tokenService, authService } = require("../../services");
 const { userType } = require("../../config/appConstants");
-const httpStatus = require("http-status");
 const {
   catchAsync,
   ApiError,
   successMessage,
-  formatUser,
-} = require("../../utils/commonFunction");
+} = require("../../utils/universalFunction");
 const config = require("../../config/config");
-const { verifyAccount } = require("../../utils/sendMail");
-const sendOtp = require("../../utils/sendOtp");
+const sendOtp = require("../../libs/sendOtp");
+const { SUCCESS, ERROR } = require("../../config/responseMessage");
+const { formatUser } = require("../../utils/formatResponse");
 
 const signup = catchAsync(async (req, res) => {
   const otpData = await sendOtp(req.body.phoneNumber);
   req.body.otp = otpData;
 
   const user = await authService.createUser(req.body);
-
-  const token = await tokenService.generateAuthTokens(user, userType.USER);
-  const emailVerifyToken = await tokenService.generateResetPasswordToken(
-    req.body.email
+  const accessToken = await tokenService.generateAuthToken(
+    user,
+    userType.USER,
+    req.body.deviceToken,
+    req.body.deviceType,
+    otpData
   );
-  await verifyAccount(req.body.email, emailVerifyToken);
+
   let formatedUser = formatUser(user.toObject());
-  return res.send(successMessage({ token, user: formatedUser }));
+  return res.send(
+    successMessage("en", SUCCESS.DEFAULT, { accessToken, user: formatedUser })
+  );
 });
 
 const verifyOtp = catchAsync(async (req, res) => {
-  await authService.verifyOtp(
-    req.token.user._id,
-    req.token.user.otp.code,
-    req.body.otp
-  );
-  res.send(successMessage("", "OTP verified successfully", 200));
+  if (!req.token.otp) {
+    throw new ApiError("en", ERROR.ACCOUNT_ALREADY_VERIFY);
+  }
+  await authService.verifyOtp(req.token._id, req.token.otp.code, req.body.otp);
+  res.send(successMessage("", SUCCESS.VERIFY_OTP));
 });
 
 const resendOtp = catchAsync(async (req, res) => {
   const otpData = await sendOtp(req.token.user.phoneNumber);
-  await authService.resendOtp(req.token.user._id, otpData);
-  res.send(successMessage("", "OTP successfull sended", 200));
+  await authService.resendOtp(req.token._id, otpData);
+  res.send(successMessage("en", SUCCESS.RESEND_OTP));
 });
 
 const socialLogin = catchAsync(async (req, res) => {
   const user = await authService.socialLogin(req.body);
-  const token = await tokenService.generateAuthTokens(user, userType.USER);
+  const token = await tokenService.generateAuthToken(user, userType.USER);
   let formatedUser = formatUser(user.toObject());
-  return res.send(successMessage({ token, user: formatedUser }));
+  return res.send(
+    successMessage("en", SUCCESS.DEFAULT, { token, user: formatedUser })
+  );
 });
 
 const login = catchAsync(async (req, res) => {
-  let { userName, password } = req.body;
-  const user = await authService.userLogin(userName, password);
+  let { email, password } = req.body;
+  const user = await authService.userLogin(email, password);
 
   if (user.isBlocked) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Your account has been blocked");
+    throw new ApiError("en", ERROR.BLOCK_USER);
   }
   if (!user.isVerified) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Please verify your account first"
-    );
+    throw new ApiError("en", ERROR.VERIFY_ACCOUNT);
   }
-  const token = await tokenService.generateAuthTokens(user, userType.USER);
+  const token = await tokenService.generateAuthToken(
+    user,
+    userType.USER,
+    req.body.deviceToken,
+    req.body.deviceType
+  );
   let formatedUser = formatUser(user.toObject());
-  return res.send(successMessage({ token, user: formatedUser }));
+  return res.send(
+    successMessage("en", SUCCESS.DEFAULT, { token, user: formatedUser })
+  );
 });
 
 const refreshTokens = catchAsync(async (req, res) => {
-  const tokens = await tokenService.refreshAuth(req.token.token);
-  return res.send(successMessage(tokens));
+  const token = await tokenService.refreshAuth(
+    req.token.user._id,
+    req.token._id,
+    req.token.device
+  );
+  return res.send(successMessage("en", SUCCESS.DEFAULT, token));
 });
 
 const logOut = catchAsync(async (req, res) => {
-  console.log(req.token);
-
-  await tokenService.logout(req.token.token);
-  return res.send(successMessage("You are successfully logged out"));
+  await tokenService.logout(req.token._id);
+  return res.send(successMessage("en", SUCCESS.USER_LOGOUT));
 });
-
-const getVerified = catchAsync(async (req, res) => {
-  const tokendata = await tokenService.verifyResetPasswordToken(
-    req.query.token
-  );
-  await authService.verifyUser(tokendata.user);
-  return res.render("commonMessage", {
-    title: "Account Verification",
-    successMessage: "Your account is successfully verified",
-    projectName: config.projectName,
-  });
-});
-
-
 
 module.exports = {
   signup,
@@ -98,7 +94,6 @@ module.exports = {
   refreshTokens,
   logOut,
   socialLogin,
-  getVerified,
   verifyOtp,
   resendOtp,
 };

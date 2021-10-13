@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const { tokenTypes } = require("../config/appConstants");
+const { tokenTypes, deviceType } = require("../config/appConstants");
 
 const tokenSchema = mongoose.Schema(
   {
-    token: { type: String, required: true, index: true },
     user: { type: mongoose.SchemaTypes.ObjectId, ref: "users", required: true },
     type: {
       type: String,
@@ -11,7 +10,18 @@ const tokenSchema = mongoose.Schema(
       required: true,
     },
     expires: { type: Date, required: true },
-    blacklisted: { type: Boolean, default: false },
+    otp: {
+      code: { type: Number },
+      expiresAt: { type: Date },
+      isNumberUpdate: { type: Boolean },
+    },
+    device: {
+      type: {
+        type: String,
+        enum: [...Object.values(deviceType)],
+      },
+      token: { type: String },
+    },
   },
   {
     timestamps: true,

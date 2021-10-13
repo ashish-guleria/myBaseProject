@@ -7,86 +7,62 @@ const config = require("../config/config");
 const { tokenTypes } = require("../config/appConstants");
 const { Token, User } = require("../models");
 const { userProfileService } = require("../services");
-const { ApiError } = require("../utils/commonFunction");
+const { ApiError } = require("../utils/universalFunction");
+const { ERROR } = require("../config/responseMessage");
 
-const generateToken = (
-  userId,
-  expires,
-  type,
-  userType,
-  tokenId,
-  secret = config.jwt.secret
-) => {
+const generateToken = (data, secret = config.jwt.secret) => {
   const payload = {
-    userId,
+    user: data.user,
     iat: moment().unix(),
-    exp: expires.unix(),
-    type,
-    role: userType,
-    tokenId,
+    exp: data.tokenExpires.unix(),
+    type: data.tokenTypes,
+    id: data.tokenId,
+    role: data.userType,
   };
   return jwt.sign(payload, secret);
 };
 
-const saveToken = async (
-  token,
-  userId,
-  expires,
-  type,
-  tokenId,
-  blacklisted = false
-) => {
+const saveToken = async (data) => {
   const tokenDoc = await Token.create({
-    token,
-    user: userId,
-    expires: expires.toDate(),
-    type,
-    blacklisted,
-    tokenId,
-    _id: tokenId,
+    user: data.userId,
+    expires: data.tokenExpires.toDate(),
+    type: data.tokenType,
+    _id: data.tokenId,
+    otp: data.otpData,
+    device: { type: data.deviceType, token: data.deviceType },
   });
   return tokenDoc;
 };
 
-const generateAuthTokens = async (user, userType) => {
-  const accessTokenExpires = moment().add(
-    config.jwt.accessExpirationMinutes,
-    "minutes"
-  );
+const generateAuthToken = async (
+  user,
+  userType,
+  deviceToken,
+  deviceType,
+  otpData
+) => {
+  const tokenExpires = moment().add(config.jwt.accessExpirationMinutes, "days");
   var tokenId = new ObjectID();
-  const accessToken = generateToken(
-    user.id,
-    accessTokenExpires,
-    tokenTypes.ACCESS,
+  const accessToken = generateToken({
+    user: user.id,
+    tokenExpires,
+    tokenTypes: tokenTypes.ACCESS,
     userType,
-    tokenId
-  );
-  const refreshTokenExpires = moment().add(
-    config.jwt.refreshExpirationDays,
-    "days"
-  );
-  const refreshToken = generateToken(
-    user.id,
-    refreshTokenExpires,
-    tokenTypes.REFRESH,
-    userType
-  );
-  await saveToken(
-    refreshToken,
-    user.id,
-    refreshTokenExpires,
-    tokenTypes.REFRESH,
-    tokenId
-  );
+    tokenId,
+  });
+
+  await saveToken({
+    userId: user.id,
+    tokenExpires,
+    tokenId,
+    otpData,
+    deviceToken,
+    deviceType,
+    tokenType: tokenTypes.ACCESS,
+  });
   return {
-    access: {
-      token: accessToken,
-      expires: accessTokenExpires.toDate(),
-    },
-    refresh: {
-      token: refreshToken,
-      expires: refreshTokenExpires.toDate(),
-    },
+    token: accessToken,
+    expires: tokenExpires.toDate(),
   };
 };
 
@@ -103,24 +79,18 @@ const verifyToken = async (token) => {
   return tokenDoc;
 };
 
-const refreshAuth = async (refreshToken) => {
-  const refreshTokenDoc = await verifyToken(refreshToken);
-  const user = await userProfileService.getUserById(refreshTokenDoc.user);
-
-  await refreshTokenDoc.remove();
-  return generateAuthTokens(user, user.userType);
+const refreshAuth = async (userId, tokenId, device) => {
+  const user = await userProfileService.getUserById(userId);
+  await Token.deleteOne({ _id: tokenId });
+  return generateAuthToken(user, user.userType, device.token, device.type);
 };
 
-const logout = async (refreshToken) => {
-  const refreshTokenDoc = await Token.findOne({
-    token: refreshToken,
-    type: tokenTypes.REFRESH,
-    blacklisted: false,
-  });
-  if (!refreshTokenDoc) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Not found");
+const logout = async (tokenId) => {
+  const token = await Token.findById(tokenId);
+  if (!token) {
+    throw new ApiError("en", ERROR.NOT_FOUND);
   }
-  return await refreshTokenDoc.remove();
+  return await token.remove();
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,11 +134,12 @@ const deleteToken = async (userId) => {
 };
 
 module.exports = {
-  generateAuthTokens,
+  generateAuthToken,
   saveToken,
   refreshAuth,
   logout,
   generateResetPasswordToken,
   verifyResetPasswordToken,
   deleteToken,
+  verifyToken,
 };

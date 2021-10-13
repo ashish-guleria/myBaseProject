@@ -1,5 +1,6 @@
+const { object } = require("joi");
 const Joi = require("joi");
-const {objectId} = require("../validations/custom.validation");
+const { objectId } = require("../validations/custom.validation");
 
 const tokenTypes = {
   ACCESS: "access",
@@ -10,6 +11,12 @@ const tokenTypes = {
 const userType = {
   ADMIN: "Admin",
   USER: "User",
+};
+
+const deviceType = {
+  IPHONE: "iPhone",
+  ANDROID: "Android",
+  WEB: "Web",
 };
 
 const linkType = {
@@ -31,6 +38,7 @@ const joi = {
   LIMIT: Joi.number().default(10),
   PAGE: Joi.number().default(0),
   OBJECTID: Joi.string().custom(objectId).required(),
+  DEVICE_TYPE: Joi.string().valid(...Object.values(deviceType)),
 };
 
 const loginType = {
@@ -45,4 +53,5 @@ module.exports = {
   status,
   joi,
   loginType,
+  deviceType,
 };

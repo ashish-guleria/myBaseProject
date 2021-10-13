@@ -14,11 +14,10 @@ const jwtVerify = async (payload, done) => {
       throw new Error("Invalid token type");
     }
 
-    const token = await Token.findOne({ _id: payload.tokenId })
+    const token = await Token.findOne({ _id: payload.id })
       .populate({ path: "user" })
       .lean();
     token.role = payload.role;
-
     if (!token) {
       return done(null, false);
     }

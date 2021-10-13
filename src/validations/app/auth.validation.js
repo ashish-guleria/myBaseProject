@@ -4,12 +4,11 @@ const { joi, loginType } = require("../../config/appConstants");
 exports.signup = {
   body: Joi.object().keys({
     name: Joi.string().required(),
-    university: Joi.string().required(),
-    club: Joi.string().required(),
-    userName: Joi.string().lowercase().trim().required(),
     email: joi.EMAIL,
     password: joi.PASSWORD,
     phoneNumber: joi.PHONENUMBER,
+    deviceType: joi.DEVICE_TYPE,
+    deviceToken: Joi.string(),
   }),
 };
 
@@ -24,22 +23,17 @@ exports.socialLogin = {
   }),
 };
 
-exports.getVerified = {
-  query: Joi.object().keys({
-    token: Joi.string().required(),
-  }),
-};
-
 exports.userLogin = {
   body: Joi.object().keys({
-    userName: Joi.string().required(),
+    email: Joi.string().required(),
     password: Joi.string().required(),
+    deviceType: joi.DEVICE_TYPE,
+    deviceToken: Joi.string(),
   }),
 };
 
-exports.verifyOtp={
+exports.verifyOtp = {
   body: Joi.object().keys({
-    otp:Joi.number().min(000000).max(999999).required()
-  })
-
-}
+    otp: Joi.number().min(000000).max(999999).required(),
+  }),
+};

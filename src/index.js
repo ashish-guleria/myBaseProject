@@ -1,10 +1,9 @@
-require("dotenv").config();
-
 const mongoose = require("mongoose");
 const app = require("./app");
 const config = require("./config/config");
 const logger = require("./config/logger");
 const CreateAdmin = require("./utils/bootstrap");
+
 
 let server;
 mongoose
@@ -25,7 +24,6 @@ mongoose
       console.log(`Listening to port ${config.port}`);
     });
   });
-
 
 const unexpectedErrorHandler = (error) => {
   logger.error(error);

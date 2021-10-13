@@ -1,5 +1,4 @@
 const express = require("express");
-const httpStatus = require("http-status");
 const mongoSanitize = require("express-mongo-sanitize");
 const cors = require("cors");
 const passport = require("passport");
@@ -8,14 +7,13 @@ const compression = require("compression");
 const { jwtStrategy } = require("./config/passport");
 const routes = require("./routes");
 const { errorConverter, errorHandler } = require("./middlewares/error");
-const scheduler = require("./utils/scheduler");
+const scheduler = require("./libs/scheduler");
 const helmet = require("helmet");
 const { authLimiter } = require("./middlewares/rateLimiter");
-const { ApiError } = require("./utils/commonFunction");
+const { ApiError } = require("./utils/universalFunction");
+const { ERROR } = require("./config/responseMessage");
 
 const app = express();
-
-
 
 app.set("view engine", "hbs");
 
@@ -58,7 +56,7 @@ app.use("/", routes);
 
 //send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
+  next(new ApiError("en", ERROR.NOT_FOUND));
 });
 
 // convert error to ApiError, if needed

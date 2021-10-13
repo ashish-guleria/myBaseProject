@@ -7,7 +7,7 @@ const {
   ApiError,
   successMessage,
   formatUser,
-} = require("../../../utils/commonFunction");
+} = require("../../../utils/universalFunction");
 const config = require("../../../config/config");
 
 const createLink = catchAsync(async (req, res) => {

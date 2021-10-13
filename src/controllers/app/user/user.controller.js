@@ -1,15 +1,14 @@
 const { userProfileService, tokenService } = require("../../../services");
 const { userType } = require("../../../config/appConstants");
-const httpStatus = require("http-status");
+
 const Token = require("../../../models/token.model");
-const { forgotPasswordEmail } = require("../../../utils/sendMail");
+const { forgotPasswordEmail } = require("../../../libs/sendMail");
 const {
   catchAsync,
-  ApiError,
   successMessage,
-  formatUser,
-} = require("../../../utils/commonFunction");
+} = require("../../../utils/universalFunction");
 const config = require("../../../config/config");
+const { formatUser } = require("../../../utils/formatResponse");
 
 const getUser = catchAsync(async (req, res) => {
   let formatedUser = formatUser(req.token.user);
