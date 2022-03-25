@@ -9,10 +9,11 @@ const {
 } = require("../../../utils/universalFunction");
 const config = require("../../../config/config");
 const { formatUser } = require("../../../utils/formatResponse");
+const { SUCCESS } = require("../../../config/responseMessage");
 
 const getUser = catchAsync(async (req, res) => {
   let formatedUser = formatUser(req.token.user);
-  return res.send(successMessage(formatedUser));
+  return res.send(successMessage("en", SUCCESS.DEFAULT, formatedUser));
 });
 
 const editProfile = catchAsync(async (req, res) => {
@@ -21,7 +22,7 @@ const editProfile = catchAsync(async (req, res) => {
     req.body
   );
   let formatedUser = formatUser(user);
-  return res.send(successMessage(formatedUser));
+  return res.send(successMessage("en", SUCCESS.DEFAULT, formatedUser));
 });
 
 const changePassword = catchAsync(async (req, res) => {
@@ -30,6 +31,7 @@ const changePassword = catchAsync(async (req, res) => {
     req.body.oldPassword,
     req.body.newPassword
   );
+  res.send(successMessage("en", SUCCESS.PASSWORD_CHANGED));
 });
 
 /////////////////////////////////////forgot password///////////////////////////////////////////

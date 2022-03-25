@@ -1,5 +1,4 @@
 const Joi = require("joi");
-const httpStatus = require("http-status");
 const pick = require("../utils/pick");
 const { ApiError } = require("../utils/universalFunction");
 const config = require("../config/config");
@@ -13,10 +12,14 @@ const validate = (schema) => (req, res, next) => {
 
   if (error) {
     console.error(error);
-    const errorMessage = error.details
+    let errorMessage = error.details
       .map((details) => details.message)
-      .join(", ");
-    return next(new ApiError(httpStatus.BAD_REQUEST, errorMessage));
+      .join(", ")
+      .replace(/"/g, "");
+    const newErrorMessage =
+      errorMessage.trim()[0].toUpperCase() +
+      errorMessage.slice(1).toLowerCase();
+    return next(new ApiError("en", newErrorMessage));
   }
   Object.assign(req, value);
   return next();

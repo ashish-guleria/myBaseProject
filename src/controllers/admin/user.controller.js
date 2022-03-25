@@ -1,11 +1,12 @@
 const {
   adminUserService,
   tokenService,
-  userService,
+  userProfileService,
 } = require("../../services");
 const { userType } = require("../../config/appConstants");
 const { catchAsync, successMessage } = require("../../utils/universalFunction");
 const { formatUser } = require("../../utils/formatResponse");
+const { SUCCESS } = require("../../config/responseMessage");
 
 const getUsers = catchAsync(async (req, res) => {
   const data = await adminUserService.getUsers(
@@ -13,27 +14,27 @@ const getUsers = catchAsync(async (req, res) => {
     req.query.limit,
     req.query.search
   );
-  return res.send(successMessage(data));
+  return res.send(successMessage("en", SUCCESS.DEFAULT, data));
 });
 
 const getUser = catchAsync(async (req, res) => {
-  const userdata = await userService.getUserById(req.query.userId);
+  const userdata = await userProfileService.getUserById(req.query.userId);
   let formatedUser = formatUser(userdata.toObject());
-  return res.send(successMessage(formatedUser));
+  return res.send(successMessage("en", SUCCESS.DEFAULT, formatedUser));
 });
 
 const block = catchAsync(async (req, res) => {
-  const user = await userService.getUserById(req.body.userId);
+  const user = await userProfileService.getUserById(req.body.userId);
   user.isBlocked
     ? (updateBody = { isBlocked: false })
     : (updateBody = { isBlocked: true });
-  const updatedUser = await userService.findOneAndUpdate(
+  const updatedUser = await userProfileService.findOneAndUpdate(
     req.body.userId,
     updateBody
   );
   await tokenService.deleteToken(updatedUser._id);
 
-  return res.send(successMessage("User successfully blocked"));
+  return res.send(successMessage("en", SUCCESS.DEFAULT));
 });
 
 module.exports = {

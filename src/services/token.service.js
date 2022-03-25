@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
-const httpStatus = require("http-status");
 var ObjectID = require("mongodb").ObjectID;
 
 const config = require("../config/config");
@@ -29,7 +28,7 @@ const saveToken = async (data) => {
     type: data.tokenType,
     _id: data.tokenId,
     otp: data.otpData,
-    device: { type: data.deviceType, token: data.deviceType },
+    device: { type: data.deviceType, token: data.deviceToken },
   });
   return tokenDoc;
 };

@@ -1,9 +1,16 @@
 const Joi = require("joi");
-const { objectId } = require("../custom.validation");
+const { joi } = require("../../config/appConstants");
 
 exports.adminLogin = {
   body: Joi.object().keys({
     email: Joi.string().email().lowercase().trim().required(),
-    password: Joi.string().min(6).required(),
+    password: joi.PASSWORD,
+  }),
+};
+
+exports.changePassword = {
+  body: Joi.object().keys({
+    oldPassword: joi.PASSWORD,
+    newPassword: joi.PASSWORD,
   }),
 };

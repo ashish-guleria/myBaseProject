@@ -23,7 +23,7 @@ const signup = catchAsync(async (req, res) => {
     otpData
   );
 
-  let formatedUser = formatUser(user.toObject());
+  let formatedUser = formatUser(user.toObject(), req.headers.timezone);
   return res.send(
     successMessage("en", SUCCESS.DEFAULT, { accessToken, user: formatedUser })
   );

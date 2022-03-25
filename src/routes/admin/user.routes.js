@@ -19,7 +19,7 @@ router.get(
   validate(userValidation.getUser),
   userController.getUser
 );
-router.post(
+router.put(
   "/block",
   auth(userType.ADMIN),
   validate(userValidation.block),

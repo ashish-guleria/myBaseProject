@@ -1,4 +1,3 @@
-const httpStatus = require("http-status");
 const { User, Token } = require("../../models");
 const { ApiError } = require("../../utils/universalFunction");
 const { joi, loginType } = require("../../config/appConstants");
@@ -64,7 +63,7 @@ const userLogin = async (email, password) => {
 const getUserById = async (userId) => {
   const user = await User.findById(userId);
   if (!user) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User does not exist exist");
+    throw new ApiError("en", ERROR.USER_NOT_EXIST);
   }
   return user;
 };

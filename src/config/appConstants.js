@@ -34,11 +34,16 @@ const status = {
 const joi = {
   EMAIL: Joi.string().email().lowercase().trim().required(),
   PASSWORD: Joi.string().min(6).required(),
-  PHONENUMBER: Joi.number().max(9999999999).min(1000000000),
+  PHONENUMBER: Joi.string()
+    .max(10)
+    .min(10)
+    .message("Please enter a valid phone number"),
   LIMIT: Joi.number().default(10),
   PAGE: Joi.number().default(0),
   OBJECTID: Joi.string().custom(objectId).required(),
-  DEVICE_TYPE: Joi.string().valid(...Object.values(deviceType)),
+  DEVICE_TYPE: Joi.string()
+    .valid(...Object.values(deviceType))
+    .required(),
 };
 
 const loginType = {

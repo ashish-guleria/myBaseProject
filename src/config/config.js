@@ -6,8 +6,7 @@ dotenv.config({ path: path.join(__dirname, "../../.env") });
 
 const envVarsSchema = Joi.object()
   .keys({
-    API_BASE_URL: Joi.string().required(),
-    PORT: Joi.number(),
+    PORT: Joi.number().required(),
     MONGODB_URL: Joi.string().required().description("Mongo DB url"),
     JWT_SECRET: Joi.string().required().description("JWT secret key"),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number()
@@ -24,8 +23,9 @@ const envVarsSchema = Joi.object()
       .description("minutes after which verify email token expires"),
     EMAIL: Joi.string().description("username for email server"),
     PASSWORD: Joi.string().description("password for email server"),
-    PROJECT_NAME: Joi.string().description("Name of project"),
-    API_BASE_URL: Joi.string().description("Api base url"),
+    PROJECT_NAME: Joi.string().required().description("Name of project"),
+    API_BASE_URL: Joi.string().required().description("Api base url"),
+    ADMIN_BASE_URL: Joi.string().description("Admin pannel base url"),
   })
   .unknown();
 
@@ -55,8 +55,8 @@ module.exports = {
       envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
   },
-  email: envVars.EMAIL,
-  password: envVars.PASSWORD,
+  smtp: { email: envVars.EMAIL, password: envVars.PASSWORD },
   baseurl: envVars.API_BASE_URL,
   projectName: envVars.PROJECT_NAME,
+  panelurl: envVars.ADMIN_BASE_URL,
 };

@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { joi } = require("../../config/appConstants");
 const { objectId } = require("../custom.validation");
 
 exports.search = {
@@ -19,7 +20,7 @@ exports.getUsers = {
 
 exports.getUser = {
   query: Joi.object().keys({
-    userId: Joi.string().custom(objectId).required(),
+    userId: joi.OBJECTID,
   }),
 };
 

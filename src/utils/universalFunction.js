@@ -1,12 +1,21 @@
 const { SUCCESS } = require("../config/responseMessage");
 class ApiError extends Error {
   constructor(language, errorMsg) {
-    if (language && language == "ar") {
-      super(errorMsg.customMessage.ar);
+    if (
+      typeof errorMsg == "object" &&
+      errorMsg.hasOwnProperty("statusCode") &&
+      errorMsg.hasOwnProperty("customMessage")
+    ) {
+      if (language && language == "ar") {
+        super(errorMsg.customMessage.ar);
+      } else {
+        super(errorMsg.customMessage.en);
+      }
+      this.statusCode = errorMsg.statusCode;
     } else {
-      super(errorMsg.customMessage.en);
+      super(errorMsg);
+      this.statusCode = 400;
     }
-    this.statusCode = errorMsg.statusCode;
   }
 }
 
@@ -37,4 +46,8 @@ const successMessage = (language, successMsg, data) => {
   }
 };
 
-module.exports = { ApiError, catchAsync, successMessage };
+const paginationOptions = (page, limit) => {
+  return { sort: { _id: -1 }, skip: page * limit, limit: limit, lean: true };
+};
+
+module.exports = { ApiError, catchAsync, successMessage, paginationOptions };

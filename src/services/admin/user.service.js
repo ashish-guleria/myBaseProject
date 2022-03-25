@@ -1,11 +1,12 @@
-const httpStatus = require("http-status");
 const { User } = require("../../models");
-const { ApiError } = require("../../utils/universalFunction");
+const {
+  ApiError,
+  paginationOptions,
+} = require("../../utils/universalFunction");
 const { userType } = require("../../config/appConstants");
 
 const getUsers = async (page, limit, search) => {
   var query = {};
-
   if (search) {
     let searchRegex = RegExp(search, "i");
 
@@ -17,17 +18,12 @@ const getUsers = async (page, limit, search) => {
       ],
     };
   }
-  const options = {
-    sort: { _id: -1 },
-    skip: page * limit,
-    limit: limit,
-    lean: true,
-  };
 
   const [users, count] = await Promise.all([
-    User.find(query, {}, options),
+    User.find(query, {}, paginationOptions(page, limit)),
     User.countDocuments(query),
   ]);
+
   return { users, count };
 };
 

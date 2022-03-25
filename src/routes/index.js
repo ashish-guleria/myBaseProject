@@ -1,10 +1,11 @@
 const express = require("express");
 const userAuth = require("./app/auth.routes");
 const userProfile = require("./app/user/profile.routes");
-const userLinks = require("./app/user/link.routes");
 
-const adminAuth = require("./admin/user.routes");
+const adminAuth = require("./admin/auth.routes");
 const adminUser = require("./admin/user.routes");
+
+const staticRoutes = require("./static.routes");
 
 const router = express.Router();
 
@@ -12,10 +13,6 @@ const defaultRoutes = [
   {
     path: "/app/user/profile",
     route: userProfile,
-  },
-  {
-    path: "/app/user/link",
-    route: userLinks,
   },
   {
     path: "/app/user/auth",
@@ -28,6 +25,11 @@ const defaultRoutes = [
   {
     path: "/admin/user",
     route: adminUser,
+  },
+
+  {
+    path: "/",
+    route: staticRoutes,
   },
 ];
 

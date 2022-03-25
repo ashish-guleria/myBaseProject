@@ -6,11 +6,17 @@ exports.ERROR = {
       // ar: "كلمة المرور غير صحيحة.",
     },
   },
-
   UNAUTHORIZED: {
     statusCode: 401,
     customMessage: {
       en: "You are not authorized to perform this action",
+      // ar: "كلمة المرور غير صحيحة.",
+    },
+  },
+  PLEASE_AUTHENTICATE: {
+    statusCode: 401,
+    customMessage: {
+      en: "Please authenticate",
       // ar: "كلمة المرور غير صحيحة.",
     },
   },
@@ -30,7 +36,6 @@ exports.ERROR = {
     },
     type: "EMAIL_ALREADY_EXIST",
   },
-
   WRONG_PASSWORD: {
     statusCode: 400,
     customMessage: {
@@ -75,6 +80,13 @@ exports.ERROR = {
     },
     type: "EMAIL_NOT_FOUND",
   },
+  USER_NOT_EXIST: {
+    statusCode: 404,
+    customMessage: {
+      en: "User does not exist",
+      // ar : 'لا تملك الصلاحية لتنفيذ هذا الإجراء'
+    },
+  },
 };
 
 exports.SUCCESS = {
@@ -104,6 +116,20 @@ exports.SUCCESS = {
     statusCode: 200,
     customMessage: {
       en: "You are successfully logged out",
+      //  ar: "نجاح",
+    },
+  },
+  USER_BLOCKED: {
+    statusCode: 200,
+    customMessage: {
+      en: "User successfully blocked",
+      //  ar: "نجاح",
+    },
+  },
+  PASSWORD_CHANGED: {
+    statusCode: 200,
+    customMessage: {
+      en: "Password successfully changed",
       //  ar: "نجاح",
     },
   },

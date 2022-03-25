@@ -20,15 +20,15 @@ try {
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: config.email,
-      pass: config.password,
+      user: config.smtp.email,
+      pass: config.smtp.password,
     },
   });
 
   function forgotPasswordEmail(email, token) {
     return new Promise((resolve, reject) => {
       var info = {
-        from: process.env.EMAIL_FROM,
+        from: config.smtp.email,
         to: email,
         subject: "Reset Password",
         html: resetPasswordTemplate({
@@ -50,7 +50,7 @@ try {
   function verifyAccount(email, token) {
     return new Promise((resolve, reject) => {
       var info = {
-        from: process.env.EMAIL_FROM,
+        from: config.smtp.email,
         to: email,
         subject: "Verify Account",
         html: verifyAccountTemplate({

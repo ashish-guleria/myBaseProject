@@ -1,22 +1,21 @@
 const passport = require("passport");
-const httpStatus = require("http-status");
 const { ApiError } = require("../utils/universalFunction");
+const { ERROR } = require("../config/responseMessage");
+const { userType } = require("../config/appConstants");
 
 const verifyCallback =
   (req, resolve, reject, role) => async (err, token, info) => {
-    
     if (err || info || !token || !token.user) {
-      return reject(
-        new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate")
-      );
+      return reject(new ApiError("en", ERROR.PLEASE_AUTHENTICATE));
     }
+
     if (role && token.role != role) {
-      return reject(
-        new ApiError(
-          httpStatus.UNAUTHORIZED,
-          "You are not authorize to perform this action"
-        )
-      );
+      return reject(new ApiError("en", ERROR.UNAUTHORIZED));
+    }
+
+    if (role === userType.ADMIN) {
+      req.token = token;
+      resolve();
     }
 
     if (req.url == "/verifyOtp" || req.url == "/resendOtp") {
@@ -24,18 +23,11 @@ const verifyCallback =
       resolve();
     }
     if (!token.user.isVerified) {
-      return reject(
-        new ApiError(httpStatus.BAD_REQUEST, "Please verify you account first")
-      );
+      return reject(new ApiError("en", ERROR.VERIFY_ACCOUNT));
     }
 
     if (token.user.isBlocked) {
-      return reject(
-        new ApiError(
-          httpStatus.BAD_REQUEST,
-          "Your account is blocked please contact to admin"
-        )
-      );
+      return reject(new ApiError("en", ERROR.BLOCK_USER));
     }
     req.token = token;
     resolve();

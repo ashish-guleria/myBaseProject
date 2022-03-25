@@ -3,11 +3,8 @@ const { joi } = require("../../../config/appConstants");
 
 exports.editProfile = {
   body: Joi.object().keys({
-    image: Joi.string().required(),
+   
     name: Joi.string().required(),
-    university: Joi.string().required(),
-    club: Joi.string().required(),
-    userName: Joi.string().required(),
     email: joi.EMAIL,
     phoneNumber: Joi.number().max(9999999999).min(1000000000).required(),
     boi: Joi.string().allow("").required(),

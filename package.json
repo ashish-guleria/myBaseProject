@@ -1,14 +1,14 @@
 {
-  "name": "builtit-permits",
+  "name": "base-project",
   "version": "1.0.0",
-  "description": "APIs of Buildit Permits, using Express node js",
+  "description": "APIs of base project, using Express node js",
   "main": "src/index.js",
   "repository": "git push --set-upstream origin master",
   "author": "Ashish guleria <ashishguleria220@gmail.com>",
   "license": "MIT",
   "engines": {
     "node": ">=14.16.1",
-    "mongo": ">=3.6.8"
+    "mongo": ">=5.0.1"
   },
   "scripts": {
     "start": "nodemon src/index"
@@ -19,7 +19,6 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
-    "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-mongo-sanitize": "^2.0.2",
     "express-rate-limit": "^5.2.6",
@@ -29,10 +28,11 @@
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
     "mongoose": "^5.12.4",
-    "multer": "^1.4.2",
     "node-schedule": "^2.0.0",
     "nodemailer": "^6.5.0",
+    "nodemon": "^2.0.15",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "validator": "^13.5.2",
