@@ -6,7 +6,7 @@ const {
 const { userType } = require("../../config/appConstants");
 
 const getUsers = async (page, limit, search) => {
-  var query = {};
+  var query = { userType: userType.USER };
   if (search) {
     let searchRegex = RegExp(search, "i");
 
